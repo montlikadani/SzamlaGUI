@@ -48,6 +48,19 @@ namespace Szamla {
             }
         }
 
+        private async System.Threading.Tasks.Task<bool> ExecuteSql(MySqlCommand cmd) {
+            try {
+                if ((await command.ExecuteNonQueryAsync()) != 1) {
+                    return false;
+                }
+            } catch (System.Data.Common.DbException ex) {
+                MessageBox.Show("Hiba lépett fel az adatbázis parancs végrehajtásakor: " + ex.Message, "Adatbázis hiba", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return false;
+            }
+
+            return true;
+        }
+
         private void Form1_FormClosing(object sender, FormClosingEventArgs e) {
             connection.Close();
         }
@@ -66,7 +79,7 @@ namespace Szamla {
             command.Parameters.AddWithValue("@egyenleg", currentAmount.Value);
             command.Parameters.AddWithValue("@nyitasdatum", nyitasDate.Value);
 
-            if ((await command.ExecuteNonQueryAsync()) != 1) {
+            if (!(await ExecuteSql(command))) {
                 return;
             }
 
@@ -96,7 +109,7 @@ namespace Szamla {
             command.Parameters.AddWithValue("@egyenleg", currentAmount.Value);
             command.Parameters.AddWithValue("@nyitasdatum", nyitasDate.Value);
 
-            if ((await command.ExecuteNonQueryAsync()) != 1) {
+            if (!(await ExecuteSql(command))) {
                 return;
             }
 
@@ -128,7 +141,7 @@ namespace Szamla {
             command.Parameters.Clear();
             command.Parameters.AddWithValue("@id", szamla.Id);
 
-            if ((await command.ExecuteNonQueryAsync()) != 1) {
+            if (!(await ExecuteSql(command))) {
                 return;
             }
 
